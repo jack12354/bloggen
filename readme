@@ -16,3 +16,5 @@ supports __markdown__
 ## outputs
 1. `/blog/index.html` - archive of all posts sorted reverse chronological
 1. `/blog/*.html` - each post as it's own page
+
+manual pasting necessary

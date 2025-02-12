@@ -1,0 +1,18 @@
+# bloggen tool
+generate static blogpages for a github site
+
+## inputs
+1. `/res/header.html` - html to be added to every page
+1. `/res/sidecolumn.html` - a static side panel that is added to every page
+1. `/posts/*` - a folder of `.txt` files with the following format:
+```
+Post Title
+mm/dd/yy
+[empty line]
+post body
+may be multiline
+supports __markdown__
+```
+## outputs
+1. `/blog/index.html` - archive of all posts sorted reverse chronological
+1. `/blog/*.html` - each post as it's own page

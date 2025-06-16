@@ -11,7 +11,11 @@ mm/dd/yy
 [empty line]
 post body
 may be multiline
-supports __markdown__
+supports markdown:
+  **bold**
+  __italic__
+  --strikethrough--
+  ```code blocks``` (including multiline)
 ```
 ## outputs
 1. `/blog/index.html` - archive of all posts sorted reverse chronological

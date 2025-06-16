@@ -6,11 +6,30 @@ import (
 	"strings"
 )
 
-func formatLine(line string) (string, error) {
+type formatter struct {
+	isInCodeBlock bool
+}
+
+func (f *formatter) formatLine(line string) (string, error) {
 	output := ""
 	var err error
 	if len(line) == 0 {
 		return output + "<br>", nil
+	}
+
+	// multiline code block handling
+	if line == "```" {
+		f.isInCodeBlock = !f.isInCodeBlock
+		if f.isInCodeBlock {
+			return "<pre>", nil
+		} else {
+			return "</pre>", nil
+		}
+	}
+
+	// no format if in code block
+	if f.isInCodeBlock {
+		return line, nil
 	}
 
 	// order matters

@@ -64,9 +64,11 @@ func main() {
 		// third line blank for future extensbility (e.g. tags)
 		filescanner.Scan()
 
+		formatter := formatter{}
+
 		// read rest of file and do formatting
 		for filescanner.Scan() {
-			line, err := formatLine(filescanner.Text())
+			line, err := formatter.formatLine(filescanner.Text())
 			if err != nil {
 				log.Fatal("error in ", postfile.Name(), err)
 			}

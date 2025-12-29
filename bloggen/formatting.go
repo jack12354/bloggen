@@ -8,6 +8,8 @@ import (
 
 type formatter struct {
 	isInCodeBlock bool
+	indentLevel   int
+	addLines      []string
 }
 
 func (f *formatter) formatLine(line string) (string, error) {
@@ -21,25 +23,71 @@ func (f *formatter) formatLine(line string) (string, error) {
 	if line == "```" {
 		f.isInCodeBlock = !f.isInCodeBlock
 		if f.isInCodeBlock {
-			return "<pre>", nil
+			line = "<pre>"
 		} else {
-			return "</pre>", nil
+			line = "</pre>"
 		}
+	}
+
+	output, err = f.checkListFormatting(line)
+	if err != nil {
+		return "", err
 	}
 
 	// no format if in code block
 	if f.isInCodeBlock {
-		return line, nil
+		return f.addExtraLines(line), nil
 	}
 
 	// order matters
-	if output, err = applyMarkdown(line); err != nil {
+	if output, err = applyMarkdown(output); err != nil {
 		return "", err
 	}
 	output = replaceLinks(output)
 	output = replaceImages(output)
 
-	return wrapInTagInline("p", output), nil
+	if f.indentLevel == 0 { // only top-level blocks have <p> tags
+		output = wrapInTagInline("p", output)
+	} else { // otherwise it's a list item
+		output = wrapInTagInline("li", output)
+	}
+
+	return f.addExtraLines(output), nil
+}
+
+func (f *formatter) addExtraLines(inStr string) string {
+	for _, addLine := range f.addLines {
+		inStr = addLine + "\n" + inStr
+	}
+	f.addLines = make([]string, 0)
+
+	return inStr
+}
+
+func (f *formatter) checkListFormatting(str string) (string, error) {
+	desiredIndent := 0
+	for _, char := range str {
+		if char == '>' {
+			desiredIndent++
+		} else {
+			break
+		}
+	}
+
+	if desiredIndent > f.indentLevel {
+		for range desiredIndent - f.indentLevel {
+			f.addLines = append(f.addLines, "<ul>")
+		}
+	}
+
+	if desiredIndent < f.indentLevel {
+		for range f.indentLevel - desiredIndent {
+			f.addLines = append(f.addLines, "</ul>")
+		}
+	}
+
+	f.indentLevel = desiredIndent
+	return str[desiredIndent:], nil
 }
 
 func applyMarkdown(str string) (string, error) {

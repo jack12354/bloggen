@@ -38,6 +38,7 @@ func main() {
 	// for every file in "posts" directory
 	files, _ := os.ReadDir("posts")
 	for _, postfile := range files {
+		start := time.Now()
 		samplefile, err := os.Open(path.Join("posts", postfile.Name()))
 		if err != nil {
 			log.Fatal(err.Error())
@@ -90,7 +91,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-		log.Println(newPost.title, "written to", newPost.url())
+		log.Println(newPost.title, "written to", newPost.url(), "in", time.Since(start))
 	}
 
 	// sort all posts reverse chronological
